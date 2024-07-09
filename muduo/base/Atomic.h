@@ -15,8 +15,19 @@ namespace muduo
 
 namespace detail
 {
+// 实现了原子操作的整数类。
+// 提供了一些基本的原子操作函数，能够在多线程环境下安全地进行整数操作。
+// get(): 获取当前整数的值。
+// getAndAdd(T x): 原子地将参数 x 加到当前整数的值中，并返回加法前的值。
+// addAndGet(T x): 原子地将参数 x 加到当前整数的值中，并返回加法后的值。
+// incrementAndGet(): 原子地自增当前整数的值，并返回自增后的值。
+// decrementAndGet(): 原子地自减当前整数的值，并返回自减后的值。
+// add(T x): 原子地将参数 x 加到当前整数的值中。
+// increment(): 原子地自增当前整数的值。
+// decrement(): 原子地自减当前整数的值。
+// getAndSet(T newValue): 原子地将当前整数的值设置为新值，并返回设置前的值。
 template<typename T>
-class AtomicIntegerT : noncopyable
+class AtomicIntegerT : noncopyable // 不可复制的
 {
  public:
   AtomicIntegerT()

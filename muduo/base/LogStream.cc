@@ -43,6 +43,7 @@ const char digitsHex[] = "0123456789ABCDEF";
 static_assert(sizeof digitsHex == 17, "wrong number of digitsHex");
 
 // Efficient Integer to String Conversions, by Matthew Wilson.
+// 整型转换为字符串
 template<typename T>
 size_t convert(char buf[], T value)
 {
@@ -223,7 +224,8 @@ void FixedBuffer<SIZE>::cookieEnd()
 
 void LogStream::staticCheck()
 {
-  static_assert(kMaxNumericSize - 10 > std::numeric_limits<double>::digits10,
+  //std::numeric_limits<double>::digits10 编译时常量
+  static_assert(kMaxNumericSize - 10 > std::numeric_limits<double>::digits10, 
                 "kMaxNumericSize is large enough");
   static_assert(kMaxNumericSize - 10 > std::numeric_limits<long double>::digits10,
                 "kMaxNumericSize is large enough");
@@ -319,6 +321,7 @@ LogStream& LogStream::operator<<(double v)
 template<typename T>
 Fmt::Fmt(const char* fmt, T val)
 {
+  // 断言T必须是算术类型
   static_assert(std::is_arithmetic<T>::value == true, "Must be arithmetic type");
 
   length_ = snprintf(buf_, sizeof buf_, fmt, val);
@@ -326,7 +329,7 @@ Fmt::Fmt(const char* fmt, T val)
 }
 
 // Explicit instantiations
-
+// 显示实例化
 template Fmt::Fmt(const char* fmt, char);
 
 template Fmt::Fmt(const char* fmt, short);

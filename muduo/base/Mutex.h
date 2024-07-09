@@ -118,7 +118,20 @@ namespace muduo
 //   mutable MutexLock mutex_;
 //   std::vector<int> data_ GUARDED_BY(mutex_);
 // };
-class CAPABILITY("mutex") MutexLock : noncopyable
+
+
+/*
+功能实现：
+构造函数 MutexLock(): 初始化互斥锁，并在初始化过程中通过 MCHECK 宏检查 pthread_mutex_init 的返回值。
+析构函数 ~MutexLock(): 在析构函数中销毁互斥锁，并通过 assert 断言确保 holder_ 的值为0，同时通过 MCHECK 宏检查 pthread_mutex_destroy 的返回值。
+isLockedByThisThread() 函数: 检查当前线程是否持有该互斥锁。
+assertLocked() 函数: 断言该互斥锁已被当前线程锁定。
+lock() 函数: 锁定互斥锁，并在成功锁定后分配一个持有者。
+unlock() 函数: 解锁互斥锁，并在解锁后取消持有者。
+getPthreadMutex() 函数: 获取内部封装的 pthread_mutex_t 类型的指针，非常数函数。
+UnassignGuard 内部类: 用于在MutexLock对象上解除锁定，防止死锁。
+*/
+class CAPABILITY("mutex") MutexLock : noncopyable // CAPABILITY("mutex")编译器扩展语法，在之前的宏中有定义
 {
  public:
   MutexLock()

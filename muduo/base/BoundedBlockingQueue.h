@@ -14,7 +14,13 @@
 
 namespace muduo
 {
+/*
+定义了一个线程安全的有界阻塞队列 BoundedBlockingQueue，它使用了 boost::circular_buffer 来实现底层的循环缓冲区
 
+put(const T& x) 和 put(T&& x) 方法用于将元素放入队列中，当队列已满时会阻塞等待直到有空间可用。
+take() 方法用于从队列中取出元素，当队列为空时会阻塞等待直到有元素可取。
+empty()、full()、size() 和 capacity() 方法用于查询队列的状态信息。
+*/
 template<typename T>
 class BoundedBlockingQueue : noncopyable
 {

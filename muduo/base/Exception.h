@@ -11,7 +11,7 @@
 
 namespace muduo
 {
-
+// 异常处理，包括调用栈信息和错误信息
 class Exception : public std::exception
 {
  public:

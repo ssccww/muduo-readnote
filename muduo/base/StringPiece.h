@@ -49,6 +49,7 @@ namespace muduo
 {
 
 // For passing C-style string argument to a function.
+// 字符串对象，可以通过c风格字符串或c++中string对象构造
 class StringArg // copyable
 {
  public:
@@ -66,6 +67,8 @@ class StringArg // copyable
   const char* str_;
 };
 
+// 字符序列的轻量级封装和管理，支持不同类型的构造和操作
+// 可以当作字符串使用
 class StringPiece {
  private:
   const char*   ptr_;

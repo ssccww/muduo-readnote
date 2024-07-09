@@ -13,12 +13,14 @@ namespace muduo
 {
 namespace CurrentThread
 {
+//__thread 关键字声明的线程局部存储变量
 __thread int t_cachedTid = 0;
 __thread char t_tidString[32];
 __thread int t_tidStringLength = 6;
 __thread const char* t_threadName = "unknown";
 static_assert(std::is_same<int, pid_t>::value, "pid_t should be int");
 
+// 获取当前线程的堆栈跟踪信息，并将其以字符串的形式保存在 strings 中
 string stackTrace(bool demangle)
 {
   string stack;
@@ -50,6 +52,7 @@ string stackTrace(bool demangle)
         {
           *plus = '\0';
           int status = 0;
+          // 将函数名转换为源程序的函数名
           char* ret = abi::__cxa_demangle(left_par+1, demangled, &len, &status);
           *plus = '+';
           if (status == 0)

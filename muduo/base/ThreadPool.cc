@@ -11,7 +11,42 @@
 #include <stdio.h>
 
 using namespace muduo;
+/*
+构造函数 ThreadPool::ThreadPool(const string& nameArg):
 
+初始化了成员变量 mutex_、notEmpty_、notFull_，分别用于线程同步和条件变量控制。
+设置了线程池的名称 name_，最大队列大小 maxQueueSize_ 和运行状态 running_。
+
+析构函数 ThreadPool::~ThreadPool():
+如果线程池处于运行状态 (running_ 为 true)，则调用 stop() 方法停止线程池。
+
+void ThreadPool::start(int numThreads):
+开启线程池，创建 numThreads 个线程并启动。
+每个线程执行 ThreadPool::runInThread 方法。
+如果 numThreads 为 0 且存在 threadInitCallback_ 回调函数，则调用回调函数。
+
+void ThreadPool::stop():
+停止线程池，将 running_ 设置为 false。
+通知所有等待在 notEmpty_ 和 notFull_ 条件变量上的线程。
+等待所有线程结束 (join() 操作)。
+
+size_t ThreadPool::queueSize() const:
+返回当前任务队列 queue_ 的大小。
+
+void ThreadPool::run(Task task):
+如果线程池为空（没有线程），直接执行任务 task。
+否则，加锁并等待任务队列 queue_ 不满且线程池处于运行状态，然后将任务加入队列并通知等待中的线程。
+
+ThreadPool::Task ThreadPool::take():
+从任务队列中取出任务并返回。如果队列为空且线程池正在运行，则等待直到有任务可取。
+取出任务后，如果设置了最大队列大小 maxQueueSize_，则通知等待中的线程队列不满。
+
+bool ThreadPool::isFull() const:
+检查任务队列是否已满。
+
+void ThreadPool::runInThread():
+线程执行函数，不断从任务队列中取出任务并执行，直到线程池停止运行或出现异常。
+*/
 ThreadPool::ThreadPool(const string& nameArg)
   : mutex_(),
     notEmpty_(mutex_),

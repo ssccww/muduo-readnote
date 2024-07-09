@@ -11,6 +11,7 @@ namespace muduo
 
 Exception::Exception(string msg)
   : message_(std::move(msg)),
+    // 输入参数为一个bool值，为true时进行函数名称的转换，为false时不进行
     stack_(CurrentThread::stackTrace(/*demangle=*/false))
 {
 }

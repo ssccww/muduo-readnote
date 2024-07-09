@@ -11,7 +11,7 @@
 
 namespace muduo
 {
-
+//控制一些线程，让其在其他线程执行结束后再进行临界资源的访问
 class CountDownLatch : noncopyable
 {
  public:
@@ -25,7 +25,7 @@ class CountDownLatch : noncopyable
   int getCount() const;
 
  private:
-  mutable MutexLock mutex_;
+  mutable MutexLock mutex_; // mutable关键字标记的变量可以在const修饰的成员函数中做修改
   Condition condition_ GUARDED_BY(mutex_);
   int count_ GUARDED_BY(mutex_);
 };

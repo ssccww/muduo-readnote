@@ -24,17 +24,21 @@ string Timestamp::toString() const
   char buf[32] = {0};
   int64_t seconds = microSecondsSinceEpoch_ / kMicroSecondsPerSecond;
   int64_t microseconds = microSecondsSinceEpoch_ % kMicroSecondsPerSecond;
+  // 格式化输出的时间，%" PRId64 " 表示打印一个int64_t类型的整数。
+  // PRId64 跨平台的64位整数
   snprintf(buf, sizeof(buf), "%" PRId64 ".%06" PRId64 "", seconds, microseconds);
   return buf;
 }
 
+// 返回格式化的时间（年月日时分秒）
 string Timestamp::toFormattedString(bool showMicroseconds) const
 {
   char buf[64] = {0};
+  //  time_t C 和 C++ 中用来表示时间的数据类型。它通常被定义为一个整数类型，用于存储从某个固定时间点开始经过的秒数，即时间戳
   time_t seconds = static_cast<time_t>(microSecondsSinceEpoch_ / kMicroSecondsPerSecond);
   struct tm tm_time;
   gmtime_r(&seconds, &tm_time);
-
+  // 上述代码的作用是将微秒数转换为本地时间的年、月、日、时、分、秒等信息，并存储在 tm_time 结构体中。
   if (showMicroseconds)
   {
     int microseconds = static_cast<int>(microSecondsSinceEpoch_ % kMicroSecondsPerSecond);
@@ -54,8 +58,8 @@ string Timestamp::toFormattedString(bool showMicroseconds) const
 
 Timestamp Timestamp::now()
 {
-  struct timeval tv;
-  gettimeofday(&tv, NULL);
+  struct timeval tv; // 包含秒+毫秒的结构体
+  gettimeofday(&tv, NULL); // 返回时间-1970 年 1 月 1 日 00:00:00 UTC（也称为 UNIX 时间戳）到当前时间点
   int64_t seconds = tv.tv_sec;
   return Timestamp(seconds * kMicroSecondsPerSecond + tv.tv_usec);
 }

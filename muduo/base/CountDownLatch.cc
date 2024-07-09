@@ -6,7 +6,7 @@
 #include "muduo/base/CountDownLatch.h"
 
 using namespace muduo;
-
+// 实现进程的同步机制，用于等待多个线程执行完毕
 CountDownLatch::CountDownLatch(int count)
   : mutex_(),
     condition_(mutex_),
@@ -14,6 +14,7 @@ CountDownLatch::CountDownLatch(int count)
 {
 }
 
+// 控制一些线程，让其在其他线程执行结束后再进行临界资源的访问
 void CountDownLatch::wait()
 {
   MutexLockGuard lock(mutex_);

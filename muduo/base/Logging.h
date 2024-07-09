@@ -14,6 +14,13 @@ namespace muduo
 
 class TimeZone;
 
+// 日志类，其中包括一个流对象
+// 在构造时会在流中写入当前时间、当前的线程id
+// 如果是错误日志还会写入错误信
+// 支持调用者在流中写入信息
+// 还会在finish()中将路径和行写入流对象中
+// 在析构时将成员LogStream中的信息输出到标准输出
+
 class Logger
 {
  public:
@@ -29,6 +36,7 @@ class Logger
   };
 
   // compile time calculation of basename of source file
+  // 保存基本文件名及其长度
   class SourceFile
   {
    public:
@@ -71,6 +79,7 @@ class Logger
   static LogLevel logLevel();
   static void setLogLevel(LogLevel level);
 
+  // 为两种类型的函数指针取别名
   typedef void (*OutputFunc)(const char* msg, int len);
   typedef void (*FlushFunc)();
   static void setOutput(OutputFunc);
@@ -121,6 +130,10 @@ inline Logger::LogLevel Logger::logLevel()
 //   else
 //     logWarnStream << "Bad news";
 //
+
+// 定义各种日志
+// 在日志本身存储时间、线程信息的基础上，加入文件信息、行、函数
+// 因为是临时对象，语句执行结束即执行析构函数，将成员流中存储的信息打印到标准输出
 #define LOG_TRACE if (muduo::Logger::logLevel() <= muduo::Logger::TRACE) \
   muduo::Logger(__FILE__, __LINE__, muduo::Logger::TRACE, __func__).stream()
 #define LOG_DEBUG if (muduo::Logger::logLevel() <= muduo::Logger::DEBUG) \
@@ -139,7 +152,9 @@ const char* strerror_tl(int savedErrno);
 //
 // Check that the input is non NULL.  This very useful in constructor
 // initializer lists.
-
+// __FILE__ 和 __LINE__ 是预定义的 C++ 宏，分别展开为当前文件名和行号
+// #val 是预处理器的字符串化操作符，将参数 val 转换为字符串字面量
+// (val) 是传递给宏的参数
 #define CHECK_NOTNULL(val) \
   ::muduo::CheckNotNull(__FILE__, __LINE__, "'" #val "' Must be non NULL", (val))
 

@@ -8,7 +8,7 @@ class noncopyable
 {
  public:
   noncopyable(const noncopyable&) = delete;
-  void operator=(const noncopyable&) = delete;
+  void operator=(const noncopyable&) = delete; //继承自此类的子类不可复制
 
  protected:
   noncopyable() = default;

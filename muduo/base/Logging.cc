@@ -95,13 +95,15 @@ inline LogStream& operator<<(LogStream& s, const Logger::SourceFile& v)
 
 void defaultOutput(const char* msg, int len)
 {
+  // 写入标准输出
   size_t n = fwrite(msg, 1, len, stdout);
   //FIXME check n
-  (void)n;
+  (void)n; // 防止编译器产生未使用变量的警告
 }
 
 void defaultFlush()
 {
+  // 使用 fflush(stdout) 函数来刷新标准输出流。刷新操作会将输出缓冲区中的数据立即写入到对应的输出设备（通常是终端）中
   fflush(stdout);
 }
 
@@ -121,7 +123,7 @@ Logger::Impl::Impl(LogLevel level, int savedErrno, const SourceFile& file, int l
     basename_(file)
 {
   formatTime();
-  CurrentThread::tid();
+  CurrentThread::tid(); // 将线程id存入线程局部变量中
   stream_ << T(CurrentThread::tidString(), CurrentThread::tidStringLength());
   stream_ << T(LogLevelName[level], 6);
   if (savedErrno != 0)
@@ -130,6 +132,8 @@ Logger::Impl::Impl(LogLevel level, int savedErrno, const SourceFile& file, int l
   }
 }
 
+// 每调用一次，更新线程局部变量中的时间
+// 并将格式化的时间写入当前Logger::Impl中的流中
 void Logger::Impl::formatTime()
 {
   int64_t microSecondsSinceEpoch = time_.microSecondsSinceEpoch();
@@ -166,7 +170,7 @@ void Logger::Impl::formatTime()
     stream_ << T(t_time, 17) << T(us.data(), 9);
   }
 }
-
+// 写入路径和行
 void Logger::Impl::finish()
 {
   stream_ << " - " << basename_ << ':' << line_ << '\n';
@@ -193,6 +197,7 @@ Logger::Logger(SourceFile file, int line, bool toAbort)
 {
 }
 
+// 将流中的内容输出到标准输出
 Logger::~Logger()
 {
   impl_.finish();

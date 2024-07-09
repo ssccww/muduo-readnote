@@ -12,7 +12,8 @@
 
 namespace muduo
 {
-
+/*通过封装 POSIX 线程库的条件变量相关函数，实现了线程间的同步与通信功能。同时，结合互斥锁 MutexLock 的使用，确保了线程同步的正确性*/
+// 实现了RAII机制，封装之后上层应用不再需要自行管理条件变量资源的申请和释放
 class Condition : noncopyable
 {
  public:

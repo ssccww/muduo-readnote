@@ -21,8 +21,8 @@ namespace muduo
 /// It's recommended to pass it by value, since it's passed in register on x64.
 ///
 class Timestamp : public muduo::copyable,
-                  public boost::equality_comparable<Timestamp>,
-                  public boost::less_than_comparable<Timestamp>
+                  public boost::equality_comparable<Timestamp>, // 类只要实现对operator==就会自动实现!=
+                  public boost::less_than_comparable<Timestamp> //类只要实现对operator==就会自动实现!=
 {
  public:
   ///
@@ -51,7 +51,7 @@ class Timestamp : public muduo::copyable,
 
   string toString() const;
   string toFormattedString(bool showMicroseconds = true) const;
-
+  // 判断是否有效
   bool valid() const { return microSecondsSinceEpoch_ > 0; }
 
   // for internal usage.
@@ -62,6 +62,7 @@ class Timestamp : public muduo::copyable,
   ///
   /// Get time of now.
   ///
+  // 获取当前时间
   static Timestamp now();
   static Timestamp invalid()
   {
@@ -81,6 +82,7 @@ class Timestamp : public muduo::copyable,
   static const int kMicroSecondsPerSecond = 1000 * 1000;
 
  private:
+  // 成员变量，表示从1970.1.1到现在一共有多少微秒
   int64_t microSecondsSinceEpoch_;
 };
 
@@ -96,7 +98,7 @@ inline bool operator==(Timestamp lhs, Timestamp rhs)
 
 ///
 /// Gets time difference of two timestamps, result in seconds.
-///
+/// 获取两个时间戳的差，以秒为单位返回
 /// @param high, low
 /// @return (high-low) in seconds
 /// @c double has 52-bit precision, enough for one-microsecond
@@ -111,7 +113,7 @@ inline double timeDifference(Timestamp high, Timestamp low)
 /// Add @c seconds to given timestamp.
 ///
 /// @return timestamp+seconds as Timestamp
-///
+/// 在一个时间上加上另一个时间
 inline Timestamp addTime(Timestamp timestamp, double seconds)
 {
   int64_t delta = static_cast<int64_t>(seconds * Timestamp::kMicroSecondsPerSecond);

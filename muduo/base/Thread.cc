@@ -25,17 +25,17 @@ namespace detail
 
 pid_t gettid()
 {
-  return static_cast<pid_t>(::syscall(SYS_gettid));
+  return static_cast<pid_t>(::syscall(SYS_gettid)); // 获取线程id
 }
 
 void afterFork()
 {
   muduo::CurrentThread::t_cachedTid = 0;
-  muduo::CurrentThread::t_threadName = "main";
+  muduo::CurrentThread::t_threadName = "main"; // 为什么名字和主进程一样？
   CurrentThread::tid();
   // no need to call pthread_atfork(NULL, NULL, &afterFork);
 }
-
+// 初始化主进程信息
 class ThreadNameInitializer
 {
  public:
@@ -71,11 +71,12 @@ struct ThreadData
   {
     *tid_ = muduo::CurrentThread::tid();
     tid_ = NULL;
-    latch_->countDown();
+    latch_->countDown(); //没执行完就down了？
     latch_ = NULL;
 
     muduo::CurrentThread::t_threadName = name_.empty() ? "muduoThread" : name_.c_str();
     ::prctl(PR_SET_NAME, muduo::CurrentThread::t_threadName);
+    //prctl() 系统调用，用于设置线程的名称。具体来说，PR_SET_NAME 是 prctl() 函数的一个操作码，用于设置进程或线程的名称
     try
     {
       func_();
@@ -119,14 +120,14 @@ void CurrentThread::cacheTid()
 {
   if (t_cachedTid == 0)
   {
-    t_cachedTid = detail::gettid();
+    t_cachedTid = detail::gettid(); // 获取线程id
     t_tidStringLength = snprintf(t_tidString, sizeof t_tidString, "%5d ", t_cachedTid);
   }
 }
-
+// 判断是否为主线程：判断当前线程的id是否等于进程id
 bool CurrentThread::isMainThread()
 {
-  return tid() == ::getpid();
+  return tid() == ::getpid(); // tid()返回t_cachedTid的值
 }
 
 void CurrentThread::sleepUsec(int64_t usec)
@@ -134,7 +135,7 @@ void CurrentThread::sleepUsec(int64_t usec)
   struct timespec ts = { 0, 0 };
   ts.tv_sec = static_cast<time_t>(usec / Timestamp::kMicroSecondsPerSecond);
   ts.tv_nsec = static_cast<long>(usec % Timestamp::kMicroSecondsPerSecond * 1000);
-  ::nanosleep(&ts, NULL);
+  ::nanosleep(&ts, NULL); // nanosleep()针对线程，sleep()针对进程
 }
 
 AtomicInt32 Thread::numCreated_;
@@ -152,16 +153,16 @@ Thread::Thread(ThreadFunc func, const string& n)
 }
 
 Thread::~Thread()
-{
+{ // 如果没有做线程回收的话，做一下线程分离
   if (started_ && !joined_)
   {
     pthread_detach(pthreadId_);
   }
 }
-
+// 为线程分配默认名字，默认为numCreated_+1
 void Thread::setDefaultName()
 {
-  int num = numCreated_.incrementAndGet();
+  int num = numCreated_.incrementAndGet(); // 线程安全版numCreated_ ++;
   if (name_.empty())
   {
     char buf[32];
@@ -169,13 +170,14 @@ void Thread::setDefaultName()
     name_ = buf;
   }
 }
-
+// 开启一个线程执行对应的函数func
 void Thread::start()
 {
   assert(!started_);
   started_ = true;
   // FIXME: move(func_)
   detail::ThreadData* data = new detail::ThreadData(func_, name_, &tid_, &latch_);
+  // pthread_create线程创建成功返回0，失败返回一个正整数
   if (pthread_create(&pthreadId_, NULL, &detail::startThread, data))
   {
     started_ = false;
@@ -184,11 +186,14 @@ void Thread::start()
   }
   else
   {
-    latch_.wait();
+    latch_.wait(); // 为什么要wait？
+    // 此处会等待runInThread()中的：latch_->countDown();
+    // 主线程等待子线程执行结束再继续执行
     assert(tid_ > 0);
   }
 }
 
+// 回收线程资源
 int Thread::join()
 {
   assert(started_);

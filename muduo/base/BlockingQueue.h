@@ -15,8 +15,16 @@
 namespace muduo
 {
 
+//提供了一个线程安全的阻塞队列
+/*
+使用 std::deque<T> 作为底层容器来存储元素。
+提供了两个 put 方法，一个接受左值引用（const T&），另一个接受右值引用（T&&），用于向队列中添加元素。右值引用版本的 put 使用了移动语义来避免不必要的拷贝操作。
+提供了 take 方法用于从队列中取出元素。在队列为空时，使用条件变量 notEmpty_ 进行等待，直到队列非空时才返回元素。
+提供了 drain 方法用于将队列中的所有元素取出并返回一个新的 std::deque<T>，同时清空原队列。
+提供了 size 方法用于获取队列中元素的数量。
+*/
 template<typename T>
-class BlockingQueue : noncopyable
+class BlockingQueue : noncopyable //不可复制
 {
  public:
   using queue_type = std::deque<T>;

@@ -14,7 +14,8 @@
 
 namespace muduo
 {
-
+// 第一次看没看懂，有点高级
+// 单例模式的实现
 namespace detail
 {
 // This doesn't detect inherited member functions!
@@ -27,7 +28,8 @@ struct has_no_destroy
   const static bool value = sizeof(test<T>(0)) == 1;
 };
 }  // namespace detail
-
+// 使用方式：
+// 在任一线程中调用Singleton<T>::instance() 会返回一个所有线程中共享的T对象的引用
 template<typename T>
 class Singleton : noncopyable
 {
@@ -37,7 +39,7 @@ class Singleton : noncopyable
 
   static T& instance()
   {
-    pthread_once(&ponce_, &Singleton::init);
+    pthread_once(&ponce_, &Singleton::init); // pthread_once指定的函数在所有线程中只执行一次
     assert(value_ != NULL);
     return *value_;
   }
@@ -48,7 +50,7 @@ class Singleton : noncopyable
     value_ = new T();
     if (!detail::has_no_destroy<T>::value)
     {
-      ::atexit(destroy);
+      ::atexit(destroy); //将destroy注册到程序的退出函数中
     }
   }
 

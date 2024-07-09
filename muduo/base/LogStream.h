@@ -20,7 +20,7 @@ namespace detail
 
 const int kSmallBuffer = 4000;
 const int kLargeBuffer = 4000*1000;
-
+// 指定大小的缓冲区
 template<int SIZE>
 class FixedBuffer : noncopyable
 {
@@ -46,16 +46,16 @@ class FixedBuffer : noncopyable
     }
   }
 
-  const char* data() const { return data_; }
-  int length() const { return static_cast<int>(cur_ - data_); }
+  const char* data() const { return data_; } 
+  int length() const { return static_cast<int>(cur_ - data_); } //返回当前字符串长度
 
   // write to data_ directly
   char* current() { return cur_; }
-  int avail() const { return static_cast<int>(end() - cur_); }
+  int avail() const { return static_cast<int>(end() - cur_); } // 剩余容量
   void add(size_t len) { cur_ += len; }
 
   void reset() { cur_ = data_; }
-  void bzero() { memZero(data_, sizeof data_); }
+  void bzero() { memZero(data_, sizeof data_); } // 将data_ 内容清零
 
   // for used by GDB
   const char* debugString();
@@ -77,6 +77,7 @@ class FixedBuffer : noncopyable
 
 }  // namespace detail
 
+// 有一个缓冲区FixedBuffer成员，重载了一系列的<< 运算符以支持不同的数据类型用<<写入缓冲区对象
 class LogStream : noncopyable
 {
   typedef LogStream self;
@@ -168,6 +169,7 @@ class LogStream : noncopyable
   static const int kMaxNumericSize = 48;
 };
 
+// 格式化字符串
 class Fmt // : noncopyable
 {
  public:

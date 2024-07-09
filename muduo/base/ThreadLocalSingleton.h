@@ -13,14 +13,16 @@
 
 namespace muduo
 {
-
-template<typename T>
+// 每个线程可以通过调用ThreadLocalSingleton<T>:: instance 来获得一个线程独立的T类型变量的引用
+// 该对象线程回收时会自动析构
+template<typename T> 
 class ThreadLocalSingleton : noncopyable
 {
  public:
   ThreadLocalSingleton() = delete;
   ~ThreadLocalSingleton() = delete;
 
+  // 每个线程在调用
   static T& instance()
   {
     if (!t_value_)
@@ -37,10 +39,15 @@ class ThreadLocalSingleton : noncopyable
   }
 
  private:
+ // 帮助线程在析构时释放T对象的内存
   static void destructor(void* obj)
   {
     assert(obj == t_value_);
-    typedef char T_must_be_complete_type[sizeof(T) == 0 ? -1 : 1];
+    // 完全类型：
+    /*
+       例如 class A; 只声明而未定义，依然可以定义对象
+    */
+    typedef char T_must_be_complete_type[sizeof(T) == 0 ? -1 : 1]; // 不完全类型会在编译阶段报错
     T_must_be_complete_type dummy; (void) dummy;
     delete t_value_;
     t_value_ = 0;
